@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+
+  db:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: 1234
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+
+  pipeline_service:
+    build: ./pipeline_service
+    restart: always
+    ports:
+      - 8001:8001
+    depends_on:
+      - db
+    volumes:
+      - ./pipeline_service:/service
+
+  mlm_service:
+    build: ./mlm_service
+    restart: always
+    depends_on:
+      - pipeline_service
+    volumes:
+      - ./mlm_service:/service
